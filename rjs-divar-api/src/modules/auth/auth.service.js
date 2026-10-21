@@ -5,6 +5,7 @@ const { AuthMessage } = require("./auth.messages");
 const { randomInt } = require("crypto");
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 class AuthService {
   #model;
   constructor() {
@@ -18,24 +19,46 @@ class AuthService {
       code: randomInt(10000, 99999),
       expiresIn: now + 1000 * 60 * 2,
     };
-    console.log(otp);
+    let savedUser;
     if (!user) {
-      const newUser = await this.#model.create({ mobile, otp });
-      return newUser;
-    }
+      savedUser = await this.#model.create({ mobile, otp });
+    } else {
     // if (user.otp && user.otp.expiresIn > now) {
     //   throw new createHttpError.BadRequest(AuthMessage.OtpCodeNotExpired);
     // }
-    user.otp = otp;
-    await user.save();
-    return user;
+      user.otp = otp;
+      await user.save();
+      savedUser = user;
+    }
+    await this.deliverOTP(mobile, String(otp.code));
+    return savedUser;
+  }
+  async deliverOTP(mobile, code) {
+    const endpoint = process.env.SMS_API_URL;
+    const token = process.env.SMS_API_TOKEN;
+    if (endpoint) {
+      await axios.post(endpoint, {
+        receptor: mobile,
+        mobile,
+        message: `کد ورود تهاتر: ${code}`,
+        text: `کد ورود تهاتر: ${code}`,
+        sender: process.env.SMS_SENDER || undefined,
+        token: token || undefined,
+      }, { timeout: 10000, headers: token ? { Authorization: `Bearer ${token}` } : {} });
+      return;
+    }
+    if (process.env.NODE_ENV !== "production" && process.env.OTP_DEV_LOG === "true") {
+      console.info(`[DEV OTP] ${mobile}: ${code}`);
+      return;
+    }
+    throw new createHttpError.ServiceUnavailable("سرویس پیامک تنظیم نشده است. مقادیر SMS_API_URL و SMS_API_TOKEN را در فایل محیطی تنظیم کنید.");
   }
   async checkOTP(mobile, code) {
     const user = await this.checkExistByMobile(mobile);
     const now = new Date().getTime();
-    if (user?.otp?.expiresIn < now)
+    if (!user?.otp?.expiresIn || user.otp.expiresIn < now)
       throw new createHttpError.Unauthorized(AuthMessage.OtpCodeExpired);
-    if (user?.otp?.code !== code)
+    if (String(user?.otp?.code) !== String(code))
       throw new createHttpError.Unauthorized(AuthMessage.OtpCodeIsIncorrect);
     if (!user.verifiedMobile) {
       user.verifiedMobile = true;
