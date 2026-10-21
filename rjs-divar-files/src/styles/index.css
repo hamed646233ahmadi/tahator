@@ -1,63 +1,41 @@
 :root {
   font-family: "Vazir", Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.5;
+  --brand-yellow: #ffd400;
+  --brand-yellow-hover: #efc600;
   --background-light: #ffffff;
-  --text-light: #333333;
+  --text-light: #111111;
   --border-light: #eaeaea;
   --shadow-light: rgba(0, 0, 0, 0.1);
-  --price-light: #e74c3c;
-  --city-light: #7f8c8d;
-
+  --price-light: #111111;
+  --city-light: #666666;
   --background-dark: #1a1a1a;
   --text-dark: #f0f0f0;
   --border-dark: #444444;
   --shadow-dark: rgba(255, 255, 255, 0.1);
-  --price-dark: #ff6b6b;
+  --price-dark: #ffd400;
   --city-dark: #bdc3c7;
+  --background-color: var(--background-light);
+  --card-background: #ffffff;
+  --border-color: var(--border-light);
+  --shadow-color: var(--shadow-light);
+  color: var(--text-light);
+  background: var(--background-light);
 }
-
+* { box-sizing: border-box; }
 body {
-  margin: auto;
-  max-width: 1600px;
-  min-height: 100vh;
-  padding: 10px;
-  background-color: var(--background-color);
-  transition: background-color 0.3s ease;
+  margin: auto; max-width: 1600px; min-height: 100vh; padding: 10px;
+  background-color: var(--background-color); transition: background-color .2s ease, color .2s ease;
   color: var(--text-light);
 }
-
 body.dark-mode {
-  background-color: var(--background-dark);
-  color: var(--text-dark);
-  --background-color: #1a1a1a;
-  --card-background: #2c2c2c;
-  --border-color: #444444;
-  --shadow-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--background-dark); color: var(--text-dark);
+  --background-color: #1a1a1a; --card-background: #2c2c2c;
+  --border-color: #444444; --shadow-color: rgba(255,255,255,.1);
 }
-
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-a {
-  text-decoration: inherit;
-  color: inherit;
-}
-
-button,
-input,
-select {
-  font-family: inherit;
-}
-
-body.dark-mode {
-  background-color: #333;
-  color: #fff;
-}
-
-.dark-mode .header {
-  background-color: #222;
-}
+a { text-decoration: inherit; color: inherit; }
+button, input, select, textarea { font-family: inherit; }
+button { color: #111111; }
+.dark-mode .header { background-color: #222222; }
+::selection { background: var(--brand-yellow); color: #111111; }
