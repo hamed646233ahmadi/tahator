@@ -1,38 +1,57 @@
-# Divar
+# تهاتر | TAHATOR
 
-A full-stack web application clone of Divar.ir, Iran's popular classified ads platform, built with React.js and Node.js.
+پلتفرم آگهی و پیشنهاد تهاتر دارایی‌ها بر پایه React/Vite و Node.js/Express/MongoDB. رابط کاربری پایه حفظ شده و رنگ‌های اصلی به زرد روشن و مشکی تغییر کرده‌اند.
 
-## Important Note ⚠️
+## امکانات افزوده‌شده در این شاخه
+- فرم ثبت آگهی با دو نوع «تهاتر دارایی» و «استخدام».
+- ثبت دارایی پیشنهادی و دارایی موردنیاز به‌صورت مستقل؛ مثل خودرو در برابر ملک، طلا در برابر خودرو یا ترکیب دارایی و وجه نقد.
+- چند تصویر برای هر آگهی، ارزش تقریبی، استان/شهر و مختصات GPS مرورگر در صورت اعطای مجوز.
+- فیلتر API بر اساس نوع آگهی، دسته‌بندی، شهر، استان و متن جست‌وجو.
+- ارسال کد ورود از طریق درگاه پیامک قابل تنظیم با متغیرهای محیطی.
+- اصلاح دستور اجرای production بک‌اند به `node main.js`.
 
-This is the frontend repository of the Divar clone project. To run the application properly, you need to:
+## نیازمندی‌ها
+Node.js 18+، npm، MongoDB قابل دسترس و ارائه‌دهنده پیامک برای OTP واقعی.
 
-1. Clone and run the backend repository first:
+## راه‌اندازی بک‌اند
+از پوشه `rjs-divar-api`:
 
 ```bash
-git clone https://github.com/keihanaf/rjs-divar-api.git
-cd rjs-divar-api
 npm install
+```
+
+فایل `.env.example` را به `.env` کپی و مقادیر واقعی را تنظیم کنید. سپس:
+
+```bash
 npm start
 ```
 
-2. The backend server will run on `http://localhost:3400`
+API به‌صورت پیش‌فرض روی پورت 3400 اجرا می‌شود؛ مقدار `PORT` قابل تغییر است.
 
-3. Then clone and run this frontend repository:
+## راه‌اندازی فرانت‌اند
+از پوشه `rjs-divar-files`:
 
 ```bash
-# Clone the frontend repository
-git clone https://github.com/keihanaf/rjs-divar-files.git
-
-# Navigate to project directory
-cd rjs-divar
-
-# Install dependencies
 npm install
+```
 
-# Start development server
+فایل `.env.example` را به `.env` کپی کنید. مقدار محلی `VITE_BASE_URL` باید `http://localhost:3400/` باشد.
+
+```bash
 npm run dev
 ```
 
-Without running the backend server (`rjs-divar-api`), the frontend application won't function properly as it depends on the API for all data operations including authentication, posts management, and category operations.
+ساخت نسخه وب:
 
-[Rest of the README content follows...]
+```bash
+npm run build
+npm run preview
+```
+
+## تنظیم پیامک OTP
+در فایل محیطی بک‌اند، `SMS_API_URL` را روی endpoint ارائه‌دهنده پیامک یا وب‌هوک واسط قرار دهید و در صورت نیاز `SMS_API_TOKEN` و `SMS_SENDER` را تنظیم کنید. درخواست فعلی JSON با فیلدهای `mobile`، `receptor`، `message`، `text`، `sender` و `token` می‌فرستد؛ ارائه‌دهنده‌ای با ساختار متفاوت به adapter اختصاصی نیاز دارد. در production اگر endpoint تنظیم نشده باشد، ارسال OTP با خطا متوقف می‌شود و کد در لاگ چاپ نمی‌شود.
+
+## مواردی که هنوز پیش از لانچ باید آزمایش/تکمیل شوند
+این شاخه تغییرات کد را دارد اما هنوز build و تست production آن از این محیط تأیید نشده است. پیش از انتشار باید نصب dependencyها، build فرانت‌اند، اجرای API، اتصال MongoDB، OTP با ارائه‌دهنده واقعی، آپلود تصاویر، دسترسی‌های ادمین، rate limiting، اعتبارسنجی ورودی و CORS در محیط استقرار آزمایش شوند. فرم فعلی موقعیت GPS مرورگر را ذخیره می‌کند؛ انتخاب دستی پین و جست‌وجوی شعاعی نیازمند اتصال سرویس نقشه و پیاده‌سازی جداگانه است. APK در این ریپازیتوری ساخته نشده است.
+
+از secret واقعی در Git استفاده نکنید. اگر مقادیر محرمانه قبلاً commit شده‌اند، آن‌ها را در سرویس مربوطه تعویض کنید و فقط از متغیرهای محیطی استفاده کنید.

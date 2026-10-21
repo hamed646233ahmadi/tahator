@@ -30,29 +30,22 @@ class PostService {
         throw new createHttpError.BadRequest(PostMessage.RequestNotValid);
     }
     async findAll (options) {
-        let {category, search} = options;
+        const { category, search, listingType, city, province } = options;
         const query = {};
         if (category) {
-            const result = await this.#categoryModel.findOne({slug: category});
-            let categories = await this.#categoryModel.find({parents: result._id}, {_id: 1});
-            categories = categories.map(item => item._id);
-            if (result) {
-                query['category'] = {
-                    $in: [result._id, ...categories]
-                };
-            } else {
-                return [];
-            }
+            const result = await this.#categoryModel.findOne({ slug: category });
+            if (!result) return [];
+            const children = await this.#categoryModel.find({ parents: result._id }, { _id: 1 });
+            query.category = { $in: [result._id, ...children.map((item) => item._id)] };
         }
+        if (listingType && ["barter", "employment"].includes(listingType)) query.listingType = listingType;
+        if (city) query.city = city;
+        if (province) query.province = province;
         if (search) {
-            search = new RegExp(search, "ig");
-            query['$or'] = [
-                {title: search},
-                {description: search},
-            ];
+            const expression = new RegExp(String(search).slice(0, 100).replace(/[.*+?^$|(){}\[\]\\]/g, "\\$&"), "i");
+            query.$or = [ { title: expression }, { content: expression }, { offerAssetDetails: expression }, { wantedAssetDetails: expression } ];
         }
-        const posts = await this.#model.find(query, {}, {sort: {_id: -1}});
-        return posts;
+        return await this.#model.find(query, {}, { sort: { _id: -1 } });
     }
     async checkExist (postId) {
         if (!postId || !isValidObjectId(postId)) throw new createHttpError.BadRequest(PostMessage.RequestNotValid);

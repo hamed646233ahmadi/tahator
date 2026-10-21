@@ -58,6 +58,14 @@ class PostController {
         lng,
         category,
         amount,
+        listingType = "barter",
+        offerAssetType = "other",
+        offerAssetDetails = "",
+        wantedAssetType = "other",
+        wantedAssetDetails = "",
+        cashDifference = 0,
+        city: submittedCity,
+        province: submittedProvince,
       } = req.body;
       const options = removePropertyInObject(req.body, [
         "amount",
@@ -67,6 +75,14 @@ class PostController {
         "lng",
         "category",
         "images",
+        "listingType",
+        "offerAssetType",
+        "offerAssetDetails",
+        "wantedAssetType",
+        "wantedAssetDetails",
+        "cashDifference",
+        "city",
+        "province",
       ]);
       for (let key in options) {
         let value = options[key];
@@ -74,16 +90,30 @@ class PostController {
         key = utf8.decode(key);
         options[key] = value;
       }
-      const { address, province, city, district } = await getAddressDetail(
-        lat,
-        lng
-      );
+      let address = "", province = submittedProvince || "", city = submittedCity || "", district = "";
+      if (lat !== undefined && lng !== undefined && lat !== "" && lng !== "") {
+        try {
+          const details = await getAddressDetail(lat, lng);
+          address = details.address || address;
+          province = details.province || province;
+          city = details.city || city;
+          district = details.district || district;
+        } catch (locationError) {
+          // Listing creation must still work when reverse-geocoding is unavailable.
+        }
+      }
       await this.#service.create({
         userId,
         title,
-        amount,
+        amount: Number(amount) || 0,
         content,
-        coordinate: [lat, lng],
+        listingType: ["barter", "employment"].includes(listingType) ? listingType : "barter",
+        offerAssetType: ["vehicle", "property", "gold", "cash", "other"].includes(offerAssetType) ? offerAssetType : "other",
+        offerAssetDetails,
+        wantedAssetType: ["vehicle", "property", "gold", "cash", "other"].includes(wantedAssetType) ? wantedAssetType : "other",
+        wantedAssetDetails,
+        cashDifference: Math.max(0, Number(cashDifference) || 0),
+        coordinate: lat !== undefined && lng !== undefined && lat !== "" && lng !== "" ? [Number(lat), Number(lng)] : [],
         category: new Types.ObjectId(category),
         images,
         options,
