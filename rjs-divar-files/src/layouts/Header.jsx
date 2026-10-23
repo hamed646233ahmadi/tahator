@@ -3,12 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { getCookie, removeCookie } from "utils/cookie.js";
 import useUser from "hooks/useUser.js";
 import { FaSun, FaMoon, FaUser } from 'react-icons/fa';
+import { toast } from "react-hot-toast";
 import styles from "./Header.module.css";
 
 function Header() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(false);
+    const [locationLabel, setLocationLabel] = useState("انتخاب موقعیت");
     const { profile } = useUser();
     const navigate = useNavigate();
 
@@ -35,6 +37,26 @@ function Header() {
         setIsDropdownOpen(false);
     };
 
+    const chooseLocation = () => {
+        if (!navigator.geolocation) {
+            toast.error("مرورگر شما از موقعیت‌یابی پشتیبانی نمی‌کند.");
+            return;
+        }
+        setLocationLabel("در حال دریافت موقعیت…");
+        navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+                localStorage.setItem("tahaterLocation", JSON.stringify({ lat: coords.latitude, lng: coords.longitude }));
+                setLocationLabel("موقعیت من ثبت شد");
+                toast.success("موقعیت جغرافیایی دریافت شد.");
+            },
+            () => {
+                setLocationLabel("انتخاب موقعیت");
+                toast.error("اجازه موقعیت‌یابی را در مرورگر فعال کنید.");
+            },
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
+        );
+    };
+
     const toggleDarkMode = () => {
         const next = !isDarkMode;
         setIsDarkMode(next);
@@ -49,9 +71,9 @@ function Header() {
                     <span className={styles.brandMark}>ت</span>
                     <span className={styles.brandName}>تهاتر</span>
                 </Link>
-                <button type="button" className={styles.locationButton} onClick={() => window.dispatchEvent(new CustomEvent('tahater:choose-location'))}>
+                <button type="button" className={styles.locationButton} onClick={chooseLocation}>
                     <span aria-hidden="true">📍</span>
-                    <span>انتخاب موقعیت</span>
+                    <span>{locationLabel}</span>
                 </button>
             </div>
             <div className={styles.headerActions}>
