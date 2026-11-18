@@ -1,7 +1,7 @@
 const ROLE_DEFINITIONS = [
   { key: "super_admin", title: "مدیر ارشد", permissions: ["*"] },
-  { key: "internal_manager", title: "مدیر داخلی", permissions: ["staff.read", "staff.create", "staff.update", "roles.read", "audit.read", "categories.read", "categories.write"] },
-  { key: "support_manager", title: "مدیر پشتیبانی", permissions: ["staff.read", "staff.create", "staff.update", "roles.read", "audit.read", "support.users", "support.listings"] },
+  { key: "internal_manager", title: "مدیر داخلی", permissions: ["staff.read", "staff.create", "staff.update", "staff.disable", "roles.read", "audit.read", "categories.read", "categories.write"] },
+  { key: "support_manager", title: "مدیر پشتیبانی", permissions: ["staff.read", "staff.create", "staff.update", "staff.disable", "roles.read", "audit.read", "support.users", "support.listings"] },
   { key: "user_support", title: "پشتیبانی کاربران", permissions: ["support.users"] },
   { key: "listing_support", title: "پشتیبانی آگهی‌ها", permissions: ["support.listings"] },
   { key: "technical_support", title: "پشتیبانی فنی", permissions: ["support.technical"] },
