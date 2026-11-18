@@ -1,0 +1,17 @@
+const { Router } = require("express");
+const controller = require("./staff.controller");
+const auth = require("./staff-auth.guard");
+const permit = require("./permission.guard");
+const router = Router();
+router.post("/auth/send-otp", controller.sendOtp);
+router.post("/auth/verify-otp", controller.verifyOtp);
+router.get("/auth/me", auth, controller.me);
+router.post("/auth/logout", auth, controller.logout);
+router.get("/admin/staff", auth, permit("staff.read"), controller.listStaff);
+router.post("/admin/staff", auth, permit("staff.create"), controller.createStaff);
+router.patch("/admin/staff/:id", auth, permit("staff.update"), controller.updateStaff);
+router.patch("/admin/staff/:id/status", auth, permit("staff.disable"), controller.setActive);
+router.get("/admin/roles", auth, permit("roles.read"), controller.listRoles);
+router.patch("/admin/roles/:key", auth, permit("roles.write"), controller.updateRole);
+router.get("/admin/audit-logs", auth, permit("audit.read"), controller.auditLogs);
+module.exports = router;
