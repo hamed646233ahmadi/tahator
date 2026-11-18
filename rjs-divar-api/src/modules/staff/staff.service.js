@@ -82,7 +82,7 @@ async function updateStaff(req, id, data) {
   }
   if (Array.isArray(data.permissionOverrides)) {
     if (req.staff.roleKey !== "super_admin") throw new createHttpError.Forbidden("تغییر مستقیم مجوزها فقط برای مدیر ارشد مجاز است");
-    if (data.permissionOverrides.some(p => p !== "*" && !ALL_PERMISSIONS.includes(p))) throw new createHttpError.BadRequest("مجوز ناشناخته است");
+    if (data.permissionOverrides.includes("*") || data.permissionOverrides.some(p => !ALL_PERMISSIONS.includes(p))) throw new createHttpError.BadRequest("مجوز ناشناخته یا غیرمجاز است");
     staff.permissionOverrides = data.permissionOverrides;
   }
   staff.updatedBy = req.staff._id;
